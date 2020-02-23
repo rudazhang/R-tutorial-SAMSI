@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Ruda Zhang" />
+  <title>R Syntax</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/table.css" />
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/pandoc.css" />
+  <script src="/usr/share/javascript/mathjax/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">R Syntax</h1>
+<p class="author">Ruda Zhang</p>
+</header>
+<h1 id="r">R</h1>
+<p>This article looks at the syntax (and semantics) of R as a programming language. The ultimate reference is <a href="https://cran.r-project.org/doc/manuals/r-release/R-lang.html">R Language Definition</a>.</p>
+<blockquote>
+<p>To understand computations in R, two slogans are helpful: Everything that exists is an object. Everything that happens is a function call. — John Chambers</p>
+</blockquote>
+<p>R programming style: interpreted, functional programming, vectorized functions.</p>
+<h2 id="syntax">Syntax</h2>
+<p>Symbols:</p>
+<ul>
+<li>No semicolon <code>;</code> needed.
+<ul>
+<li>R is smart enough to handle line continuation, such as open operator and parenthesis.</li>
+<li>One potential use of semicolon <code>;</code> is to separate two statements on the same line.</li>
+</ul></li>
+<li>Quotes: String literals are double quoted <code>"</code> in default; single quotes <code>'</code> are also accepted.
+<ul>
+<li>Double escape: R always interpret backslash as the escape character, so <code>\</code> in a string literal shall be represented as <code>\\</code>;</li>
+</ul></li>
+</ul>
+<p>Reserved words:</p>
+<ol type="1">
+<li>Constants: <code>NULL</code>, <code>NA</code>, <code>NA_integer_</code>, <code>NA_real_</code>, <code>NA_complex_</code>, <code>NA_character_</code>, <code>NaN</code>, <code>Inf</code>, <code>TRUE</code>, <code>FALSE</code>.</li>
+<li>Function definition: <code>function</code>, <code>...</code>, and <code>..1,</code>, <code>..2</code>, etc.</li>
+<li>Control flows: <code>if</code>, <code>else</code>; <code>for</code>, <code>in</code>; <code>while</code>, <code>repeat</code>, <code>next</code>, <code>break</code>.</li>
+</ol>
+<p>Identifiers:</p>
+<ul>
+<li>Syntactic names have pattern <code>[a-zA-Z][a-zA-Z0-9._]*</code> and can be used as-is.
+<ul>
+<li>Identifiers with a leading dot <code>.</code> are hidden, but the second character cannot a digit.</li>
+</ul></li>
+<li>Non-syntactic names shall be quoted in back-ticks <code>`</code> and take any character.
+<ul>
+<li>Single or double quotes may also work, as a character constant are often converted to a name.</li>
+</ul></li>
+</ul>
+<h3 id="functions">Functions</h3>
+<p>Function expression: <code>function() {}</code></p>
+<ul>
+<li>Formal arguments are comma separated names, optional assigned with default values or expressions.</li>
+<li><code>...</code> passes on unmatched arguments, often used in S3 generics; <code>..n</code>, refers to the n-th unmatched argument.</li>
+<li><code>missing()</code> determines if a formal argument is supplied or not.</li>
+<li><code>force()</code>, force evaluation of a formal argument.</li>
+<li>You can choose to return early by using <code>return()</code>.</li>
+<li><code>invisible()</code> objects are not printed by default.</li>
+</ul>
+<p>Function names are object names, so they shall not conflict with names bound to other objects.</p>
+<p>Functions bound to special names have additional call syntax:</p>
+<ol type="1">
+<li><strong>Infix functions</strong> (operators): a syntactic sugar for calling a binary function where function name is put in between the arguments, e.g. <code>1+5</code> is implemented as <code>`+`(1, 5)</code>.
+<ul>
+<li>Syntactic operators:
+<ul>
+<li><code>~</code>, <code>:</code>, <code>::</code>, <code>:::</code>, <code>[</code>, <code>[[</code>, <code>$</code>, <code>@</code>;</li>
+<li><code>^</code>, <code>*</code>, <code>/</code>, <code>+</code>, <code>-</code>;</li>
+<li><code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>!=</code>, <code>!</code>, <code>&amp;</code>, <code>&amp;&amp;</code>, <code>|</code>, <code>||</code>;</li>
+<li><code>&lt;-</code>, <code>&lt;&lt;-</code>, <code>=</code>, <code>-&gt;</code>, <code>-&gt;&gt;</code>.</li>
+</ul></li>
+<li>Special binary operators:
+<ul>
+<li><code>%%</code>, <code>%*%</code>, <code>%/%</code>, <code>%o%</code>, <code>%x%</code>, <code>%in%</code>.</li>
+<li>Users can call a function as an infix by naming it with enclosing ‘%’;</li>
+<li>Special operators have higher precedence than <code>*</code> and <code>/</code>, but lower precedence than <code>^</code>;</li>
+<li>The pipe operators in <code>magrittr</code>, Hadley’s fallback operator <code>%||%</code>.</li>
+</ul></li>
+</ul></li>
+<li><strong>Replacement functions</strong> (replacement form of a function): simulates modification of mutable objects, e.g. <code>class(x) &lt;- "Date"</code> is implemented as <code>x &lt;- `class&lt;-`(x, "Date")</code>.</li>
+</ol>
+<p>Numerical operators:</p>
+<ul>
+<li><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, arithmetics (component-wise).</li>
+<li><code>^</code> and <code>**</code>, power.</li>
+<li><code>%%</code>, <code>%/%</code>, modulo and integer division (component-wise).</li>
+<li><code>%*%</code>, matrix multiplication (returns a matrix).</li>
+<li><code>%o%</code>, <code>%x%</code>, outer and Kronecker products of arrays: <code>outer()</code>, <span class="math inline">\(C_{i,j,k,l} = f(A_{i,j}, B_{k,l})\)</span>; <code>kronecker()</code>, <span class="math inline">\(C_{p*(i-1)+k, q*(j-1)+l} = f(A_{i,j}, B_{k,l})\)</span>, where <span class="math inline">\(\dim(B) = (p, q)\)</span>.</li>
+</ul>
+<p>Logical operators:</p>
+<ul>
+<li>logic AND: <code>&amp;</code> (component-wise) and <code>&amp;&amp;</code> (single value).</li>
+<li>logic OR: <code>|</code> (component-wise) and <code>||</code> (single value).</li>
+<li>logic NOT: <code>!</code> (component-wise).</li>
+<li>logic XOR: <code>xor()</code>.</li>
+<li><code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, comparisons.</li>
+<li><code>%in%</code>, value matching (<code>match()</code>).</li>
+</ul>
+<p>Extraction operators:</p>
+<ul>
+<li>subsetting operator: <code>[</code>;</li>
+<li>recursive selector: <code>[[</code> (name and position), <code>$</code> (name only, unquoted, partial matching);</li>
+<li>slot extraction operator: <code>@</code> (equivalent to <code>$</code>);</li>
+</ul>
+<p>Assignment operators:</p>
+<ul>
+<li>Assignment: <code>&lt;-</code>; <code>=</code> (mostly used for value passing, does assignment in top level code).</li>
+<li>Superassignment: <code>&lt;&lt;-</code> (to enclosing environment).</li>
+<li>Rightward assignments: <code>-&gt;</code>, <code>-&gt;&gt;</code>.</li>
+</ul>
+<p>Other operators:</p>
+<ul>
+<li><code>:</code>, integer sequence operator, factor interaction operator.</li>
+<li><code>::</code> (exported) and <code>:::</code> (internal), package namespace access.</li>
+<li><code>~</code>, formula separator.</li>
+<li><code>$</code>, RC method call operator.</li>
+</ul>
+<p><em>WARNING</em>: All operators can be overridden, but be careful when you use special names for functions.</p>
+<h3 id="statements">Statements</h3>
+<p>You should never need to perform explicit looping except for: modification in place (stateful), recursive functions (stateful), <code>while</code> loops (simulations). If you cannot find a functional solution in base R or a (responsibly written) third-party R package, you should write a C++ function with Rcpp.</p>
+<ul>
+<li>Compound statements are be grouped inside curly brackets <code>{}</code>.</li>
+<li>Control Flows: (functions as keywords)
+<ul>
+<li>Conditional: <code>if() {} else if() {} else {}</code>, <code>ifelse()</code> (element selection), <code>switch()</code> (not vectorized);</li>
+<li>Loop: <code>for(var in sequence) {}</code>, <code>while() {}</code>, <code>repeat {}</code>, <code>break</code>, <code>next</code>;</li>
+</ul></li>
+<li>Comments: line comment <code>#</code>.</li>
+</ul>
+<h2 id="object-types">Object Types</h2>
+<p>Common R object types: vector (mode), function, environment, language.</p>
+<p>Objects are immutable, implemented as <a href="https://en.wikipedia.org/wiki/Immutable_object#Copy-on-write">copy-on-write</a>, except for environments and (perhaps) some primitive replacement forms.</p>
+<p>In R, parsed expressions represent every elementary expression as a function call, including all R syntactic elements such as the assignment operators and subsetting operators. For example, recursive selector <code>[[</code> used as <code>l[[3]]</code> will be parsed as <code>`[[`(l, 3)</code>; the back brackets <code>]]</code> are simply syntactical. <code>(</code> evaluates one expression and return visibly. <code>{</code> evaluates a sequence of expressions and returns the value of the last, preserving visibility.</p>
+<p>Beyond its components, an object has three properties (metadata): <strong>length</strong> (<code>length()</code>), <strong>type</strong> (<code>typeof()</code>), and <strong>attributes</strong> (<code>attributes()</code>). Not all types of R objects can have length greater than one, e.g. functions (“builtin”, “special”, “closure”). Attributes is a named list associating arbitrary metadata to an object.</p>
+<h2 id="vectors">Vectors</h2>
+<p>A <strong>vector</strong> is a one dimensional object consisting of various <strong>components</strong>. R does not actually have “scalars”; the most elementary object is an atomic vector of length 1.</p>
+<h3 id="vector-types">Vector types</h3>
+<p>A vector is <strong>atomic</strong> if all its components are of the same atomic type (homogeneous); otherwise it is <strong>recursive</strong>, with type “list”.</p>
+<ol type="1">
+<li>Atomic vectors have atomic types:
+<ol type="1">
+<li>“NULL”: <code>NULL</code>;</li>
+<li>“raw”: bytes (hex) <code>0a</code>;</li>
+<li>“logical”: Booleans (<code>TRUE</code>, <code>T</code>, <code>FALSE</code>, <code>F</code>), missing value <code>NA</code>;</li>
+<li>“integer” (4B): <code>1L</code>, <code>NA_integer_</code>;</li>
+<li>“double” (8B): <code>1</code>, <code>Inf</code>, <code>NaN</code>, <code>NA_real_</code>;</li>
+<li>“complex” (16B): <code>1i</code>, <code>NA_complex_</code>;</li>
+<li>“character”: <code>'a'</code>, <code>"a"</code>, <code>NA_character_</code>;</li>
+</ol></li>
+<li>Recursive vectors are of type “list”.
+<ol type="1">
+<li>“expression”: a list of calls, “symbol”s, “pairlist”s, etc.</li>
+</ol></li>
+</ol>
+<p><strong>Atomic types</strong> in R are adopted from C. A <strong>list</strong> is an ordered collection of objects with arbitrary types. An <strong>expression</strong> behaves much like a list and shall be thought of as so.</p>
+<p>Coercion rule: NULL &lt; raw &lt; logical &lt; integer &lt; double &lt; complex &lt; character &lt; list &lt; expression.</p>
+<table>
+<caption>Truth table with <code>NA</code></caption>
+<thead>
+<tr class="header">
+<th>operand</th>
+<th>AND</th>
+<th>OR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TRUE</td>
+<td>NA</td>
+<td>TRUE</td>
+</tr>
+<tr class="even">
+<td>FALSE</td>
+<td>FALSE</td>
+<td>NA</td>
+</tr>
+<tr class="odd">
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vector-attributes">Vector attributes</h3>
+<p>The “names” attribute (<code>names()</code>) associate each component of a vector with a name, which is useful for component extraction.</p>
+<p>The “dim” attribute (<code>dim()</code>) assume dimensions to a vector (including list), with <code>class()</code> <strong>matrix</strong> or <strong>array</strong> inferred from the number of dimensions (<code>length(dim())</code>), in colexicographic order, i.e. the least significant index first, similar to little-endian format.</p>
+<p>The “class” attribute (<code>class()</code>) is used to build on additional behavior. Vectors that do not have a class are called <strong>base type</strong> objects.</p>
+<p>Vector-based S3 classes in base R (“augmented vectors” in Hadley’s words):</p>
+<ol type="1">
+<li>Atomic vector: “ts”.
+<ol type="1">
+<li>Integer vectors: “factor”.</li>
+<li>Double vectors: “Date”, “POSIXct”, “difftime”.</li>
+</ol></li>
+<li>List: “POSIXlt”, “data.frame”.</li>
+</ol>
+<p>Time-series <strong>ts</strong> are atomic vectors typically sampled at equal-spaced points in time, with an attribute for start and end times and frequency (<code>tsp()</code>). A <strong>factor</strong> is an integer vector with a levels attribute (<code>levels()</code>) which is a character vector. The levels act as a mapping between its indices and string values, like a compact dictionary. A <strong>data.frame</strong> is a named list of equal-row vectors with unique row names (<code>row.names()</code>); duplicate (column) names are allowed but not recommended. <code>data.frame()</code> converts character vectors to factors in default (<code>options()$stringAsFactors</code>).</p>
+<h3 id="extraction">Extraction</h3>
+<p>Subsetting objects:</p>
+<ol type="1">
+<li>by integer index <code>x[i]</code> (positive, selection; negative, exclusion; zero, a zero-length vector):
+<ul>
+<li>Multi-dimensional index (matrix, array): <code>a[i, j, k]</code>.</li>
+<li>Index matrix (matrix, array): <code>m[cbind(i, j)]</code>.</li>
+<li>Non-integer indices are truncated: <code>letters[pi]</code>.</li>
+<li>Indexing by factor is equivalent to indexing by its integer codes.</li>
+</ul></li>
+<li>by logical value (<code>TRUE</code> for selection, <code>FALSE</code> for exclusion): <code>x[c(T, F, T)]</code>.</li>
+<li>by character name (if components have names): <code>x['name']</code>.</li>
+<li>empty index selects all values: <code>x[]</code>.
+<ul>
+<li>Assignment to empty index <code>[&lt;-</code> preserves all properties/metadata of the object.</li>
+<li>Empty index in one dimension selects ALL values in that dimension (matrix, array): <code>m[i,]</code>.</li>
+</ul></li>
+<li>A missing value in the index always yields a missing value in the output.</li>
+</ol>
+<p>With argument <code>drop = TRUE</code> (default), subsetting by any non-empty index will drop all attributes except “names”, “dim” and “dimnames”, and delete dimensions of size one. S3 and S4 classes can override the above standard behavior. Factor defaults to <code>drop = FALSE</code>; set to <code>TRUE</code> to delete unused levels and remap components. data.frame defaults to <code>drop = FALSE</code> unless only one row is left.</p>
+<p>Recursively selecting a single component from an object: (names are dropped.)</p>
+<ol type="1">
+<li>by integer index <code>l[[i]]</code>:
+<ul>
+<li>recursion: <code>l[[i]][[j]]</code> is equivalent to <code>l[[c(i, j)]]</code>;</li>
+<li>applies to multi-dimensional arrays: <code>a[[i, j, k]]</code>;</li>
+</ul></li>
+<li>by character name: <code>l[['name']]</code>, <code>l$name</code>.
+<ul>
+<li>partial matching: <code>[[</code> has option <code>exact = FALSE</code>; <code>$</code> defaults to partial matching, no computed indices;</li>
+<li>recursion: <code>l$a$b</code> is equivalent to <code>l[[c('a', 'b')]]</code>.</li>
+</ul></li>
+</ol>
+<p>Subassignment: All extraction operators can be combined with assignment to modify selected values of the input vector (<code>[&lt;-</code>, <code>[[&lt;-</code>, <code>$&lt;-</code>).</p>
+<h2 id="function">Function</h2>
+<p>Overview of function semantics:</p>
+<ol type="1">
+<li>Functions as keywords (Memorizing function names is an important part of being fluent in R.)</li>
+<li>Lazy evaluation (aka call by need): Arguments are not evaluated until needed.</li>
+<li>Lexical scoping†</li>
+</ol>
+<p>† (Dynamic scoping is also used in select functions to save typing during interactive analysis.)</p>
+<p>Function types: (<code>typeof()</code>)</p>
+<ol type="1">
+<li>primitive/internal functions:</li>
+<li>“special”, a internal function that does not evaluate its arguments;</li>
+<li>“builtin”, a internal function that evaluates its arguments;</li>
+<li>“closure”, a function;</li>
+</ol>
+<p>Primitive functions consist of a single <code>.Primitive()</code> call to C code. Internal functions call <code>.Internal()</code>.</p>
+<p>Because R has no scalars, most built-in functions are vectorized: they operate on vectors of arbitrary length, unless they do argument checking.</p>
+<p>The <strong>formal arguments</strong> are a property of the function, whereas the <strong>actual arguments</strong> can vary each time you call the function.</p>
+<p>Argument mapping from actual arguments to formal arguments:</p>
+<ul>
+<li>Arguments are matched, in order, by exact name, by prefix matching (if unambiguous), by position;</li>
+<li>Generally, you only want to use positional matching for the first few arguments that are obvious given the function name.</li>
+<li>Named arguments should always come after unnamed arguments.</li>
+<li>Only use sensible abbreviations in partial matching.</li>
+</ul>
+<p>The actual arguments are evaluated in the calling environment; the argument defaults are evaluated in the execution environment. Lazy evaluation of the actual arguments are implemented via <strong>promises</strong>, a data structure that contains the expression of the actual argument, a pointer to the calling environment, and the resulting value once evaluated. The expression of a promise can contain formal arguments bound to unevaluated promises, and thus the evaluation of a promise can be recursive. Promises are used consistently for all formal arguments with or without actual arguments. You cannot get information about a promise in pure R without evaluating it, but you can use <code>pryr::promise_info()</code>.</p>
+<p><strong>Recycling rule</strong>: when operating on vectors of different length, R will silently expand the shorter vector to the same length as the longer, unless the length of the longer is not an integer multiple of the length of the shorter. The recycling rule is recommended only when the shorter vector has length 1.</p>
+<h2 id="environment">Environment</h2>
+<p><strong>Environment</strong> is a data structure consisting of a <strong>frame</strong> which contains name-object bindings, and a pointer to an <strong>enclosing environment</strong> (aka <strong>enclosure</strong>) which is passed on for name search under inheritance.</p>
+<p>Frame behaves much like a named list: a <strong>binding</strong> associates a name with an object in memory; you may see them by coercing an environment object <code>as.list()</code>. Environments have <strong>reference semantics</strong>: bindings are modified in place. The data structure of environment defines a <strong>chain of enclosures</strong> for a name: when a name search fails in an environment and inheritance is enabled, the frame of this environment’s enclosure (<code>parent.env()</code>) is searched; this process repeats until the empty environment is reached.</p>
+<p>The global, base and empty environments may be referred to as <strong>system environments</strong>:</p>
+<ol type="1">
+<li>The <strong>empty environment</strong> <code>emptyenv()</code> has no frame, and is the only environment with no enclosing environment.</li>
+<li>The <strong>base environment</strong> <code>baseenv()</code> is the package environment of the <code>base</code> package.</li>
+<li>The <strong>global environment</strong> <code>globalenv()</code> or <code>.GlobalEnv</code> is the environment of an interactive session, colloquially known as the user’s workspace.</li>
+</ol>
+<p>Two environments associated with a package:</p>
+<ol type="1">
+<li>The <strong>package environment</strong> contains bindings to all exported functions of a package and is placed on the search path; <code>.packages()</code> invisibly returns names of attached packages.</li>
+<li>The <strong>namespace environment</strong> or <strong>namespace</strong> encloses and binds all functions defined in a package, whose own enclosure is a special <strong>imports environment</strong> which contains bindings to all the functions the package imports.</li>
+</ol>
+<p>Most environments are created as a consequence of using functions. There are four types of environment associated with a function:</p>
+<ol type="1">
+<li>The <strong>enclosing environment</strong> (<code>environment()</code>) of a function is initiated as the environment where the function was created, and may be subsequently changed.</li>
+<li>A <strong>binding environment</strong> of a function is any environment with a binding to the function; unless the function is bound to a different environment at creation, the enclosing environment is a binding environment.</li>
+<li>A <strong>calling environment</strong> (<code>parent.frame()</code>) of a function is the environment of any caller of the function.</li>
+<li>An <strong>execution environment</strong> of a function is an ephemeral environment that stores name bindings created during function execution.</li>
+</ol>
+<p>To avoid confusion, it is best to never use ‘parent’ when referring to an environment.</p>
+<p>The chain of enclosures for an exported function of a package: (top-down order)</p>
+<ol type="1">
+<li>Empty environment <code>emptyenv()</code>;</li>
+<li>Search path <code>search()</code>: all attached packages and objects; newcomer gets appended.
+<ol type="1">
+<li>Base package environment <code>baseenv()</code>;</li>
+<li>Autoload environment <code>.AutoloadEnv</code>: loads package objects when needed.</li>
+<li>package environment of other built-in packages (names: ‘package:’);</li>
+<li>other package environments and objects attached (e.g. ‘tools:rstudio’);</li>
+</ol></li>
+<li>Global environment <code>globalenv()</code>, <code>.GlobalEnv</code>;</li>
+<li>Base namespace environment <code>.BaseNamespaceEnv</code> (‘namespace:base’);</li>
+<li>Imports environment: (‘imports:pkgname’);</li>
+<li>Namespace environment: (‘namespace:pkgname’);</li>
+</ol>
+<p><img alt="namespace" width="100%"
+src="http://adv-r.had.co.nz/diagrams/environments.png/namespace.png"></p>
+<p>Figure: The chain of enclosures illustrated with <code>stats::sd()</code>.</p>
+<p>Environment as a data structure is useful for three common issues:</p>
+<ol type="1">
+<li>Avoid copies of large data (This use case is substantially reduced by efficient vector reuse since R 3.1.0.)</li>
+<li>Manage state within a package.</li>
+<li>Simulate a hash table: efficiently looking up values from names.</li>
+</ol>
+<h2 id="formula">Formula</h2>
+<p>In R, statistical models can be specified as a compact symbolic expression <code>response ~ model</code>, which evaluates to an object of S3 class “formula”.</p>
+<p>The <code>model</code> consists of numeric variables and factors (dummy variables) connected by:</p>
+<ul>
+<li><code>+</code>, linear combination;</li>
+<li><code>:</code>, interaction;</li>
+<li><code>*</code>, factor crossing (linear combination and interaction);</li>
+<li><code>^</code>, factor crossing to the specified degree;</li>
+<li><code>%in%</code> and <code>/</code>, nesting (different orders; A/B == A + A:B);</li>
+<li><code>-</code>, removal (The intercept can be removed with either <code>- 1</code> or <code>+ 0</code>).</li>
+<li><code>|</code>, conditioning (<code>Lattice</code>);</li>
+</ul>
+<p>Arithmetic expression is also allowed in <code>model</code> and <code>response</code>. <code>I()</code> preserves the arithmetic meaning of an operator in case of confusion.</p>
+</body>
+</html>
