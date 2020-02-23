@@ -1,0 +1,7 @@
+# R project auto files
+.Rhistory
+.Rproj.user
+
+# IDE project files
+.emacs.desktop*
+*~
