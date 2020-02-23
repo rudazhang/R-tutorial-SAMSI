@@ -1,12 +1,16 @@
-## Tutorial on R, the statistical programming language
+## Tutorial on R, the programming language for data analysis.
 ## author: Ruda Zhang <rzhang@samsi.info>
 ## date: 2020-02-24
+
+## Get help
+?help
 
 ## Operators: algebraic
 3 + 2
 3 - 2
 3 * 2
 3 / 2
+## power
 3^2
 
 ## Operators: logical

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Ruda Zhang" />
+  <title>R Base</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/table.css" />
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/pandoc.css" />
+  <script src="/usr/share/javascript/mathjax/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">R Base</h1>
+<p class="author">Ruda Zhang</p>
+</header>
+<h1 id="r-base">R Base</h1>
+<p>The R distribution comes with several base packages, which are maintained by the R Core Team in the same Subversion tree with R: <a href="https://svn.r-project.org/R/trunk/src/library">Upstream of R base packages</a>. An overview of these packages is available at <a href="https://cran.r-project.org/doc/FAQ/R-FAQ.html#Add_002don-packages-in-R">R FAQ</a>.</p>
+<p>Some of these base packages are attached at R initiation: <code>base</code>, <code>methods</code>, <code>datasets</code>, <code>utils</code>, <code>grDevices</code>, <code>graphics</code>, <code>stats</code>; while others are not: <code>grid</code>, <code>tools</code>, <code>tcltk</code>, <code>splines</code>, <code>stats4</code>, <code>compiler</code>, <code>parallel</code>, <code>profile</code>, <code>translations</code>. (Start a new R session and run <code>grep('package:', search(), value = TRUE)</code>.)</p>
+<p>The <code>base</code>, <code>utils</code>, <code>stats</code> packages are particularly important in mastering R. This article lists functions in these packages that constitute a good working vocabulary of base R. This article also covers some example data in <code>datasets</code> and functions in <code>graphics</code>.</p>
+<p>Note: “(pure)” denotes pure functions, i.e. a function that always returns the same result on the same input and does not cause any semantically observable side effect.</p>
+<h2 id="the-base-base">The Base <code>base</code></h2>
+<p>Package <code>base</code> provides the defining functions of R the programming language. It includes arithmetic, input/output, basic programming support, etc.</p>
+<p>Data:</p>
+<ul>
+<li><code>R.version</code>, version information about the running R session.</li>
+<li><code>letters</code>, <code>LETTERS</code>, <code>month.abb</code>, <code>month.name</code>, <code>pi</code>, built-in constants.</li>
+<li><code>.Library</code>, <code>.Library.site</code>, default library;</li>
+<li><code>.Machine</code>, a list of numerical characteristics of the machine: <code>double.eps</code>, <code>sizeof.long</code>;</li>
+</ul>
+<p>R session:</p>
+<ul>
+<li><code>options()</code>, access global R options: <code>error=c(stop, recover)</code>;</li>
+<li><code>q()</code>, <code>quit()</code>, quit an R session;</li>
+<li><code>set.seed()</code>, set <code>.Random.seed</code>, the state of R’s random number generator (RNG), with one integer;</li>
+<li><code>system.time()</code>, <code>proc.time()</code>, get CPU time of an expression/the currently running R process (not a print function);</li>
+<li><code>getwd()</code>, <code>setwd()</code>, get/set working directory;</li>
+<li><code>sessionInfo()</code>;</li>
+</ul>
+<p>System functionality (environment, filesystem):</p>
+<ul>
+<li><code>Sys.getenv()</code>, <code>Sys.setenv()</code>, get/set system environment variables.</li>
+<li><code>Sys.which()</code>, <code>system()</code>, invoke a system command;</li>
+<li><code>Sys.sleep()</code>, suspend/pause execution for a certain seconds;</li>
+<li><code>R.home()</code>, root directory of the R installation (<code>R RHOME</code> in shell); <code>system.file()</code>, finds the full file names of package files.</li>
+<li><code>dir()</code>, <code>Sys.glob()</code>, list/glob files in a directory.</li>
+<li><code>dir.create()</code>, create a path.</li>
+<li><code>dirname()</code>, <code>basename()</code>, extract leading directories or filename of a path.</li>
+<li><code>file.path()</code>, <code>path.expand()</code>, <code>normalizePath()</code>, construct/expand/normalize paths.</li>
+<li>file operations: <code>file.choose()</code>, <code>file.exists()</code>, <code>file.info()</code>, <code>file.create()</code>, <code>file.copy()</code>, <code>file.remove()</code>, <code>file.rename()</code>.</li>
+<li><code>tempdir()</code>, <code>tempfile()</code>, create names for temporary files.</li>
+<li>File connections: <code>file()</code>, <code>gzfile()</code>, <code>unz()</code>, etc. ; <code>pipe()</code>, standard streams; <code>url()</code>, network resource;</li>
+<li><code>source()</code>, read R code from a file or a connection;</li>
+<li><code>scan()</code>, read into a vector or list, type default to double.</li>
+<li><code>readLines()</code>, <code>writeLines()</code>, text lines I/O via a connection.</li>
+<li><code>readChar()</code>, <code>writeChar()</code>, character strings of known lengths I/O via a connection.</li>
+<li><code>readRDS()</code>, <code>saveRDS()</code>, I/O interface for a single R object (<code>.rds</code> file).</li>
+<li><code>gc()</code>, force garbage collection (clean up memory of removed object and return memory to the OS) and report on memory usage.</li>
+</ul>
+<p>R environment operation:</p>
+<ul>
+<li>Query: <code>ls()</code>, <code>objects()</code>, list names in an environment; <code>exists()</code>, check if a name is defined; <code>get()</code>, get value with a name in an environment;</li>
+<li>Modify: <code>assign()</code>, bind value to a name; <code>rm()</code>, <code>remove()</code>, remove objects;</li>
+<li>Meta: <code>parent.env()</code>, the enclosure; <code>environmentName()</code>, the environment name; <code>env.profile()</code> overviews the hash table of an environment, if it uses one;</li>
+<li>Search path: <code>search()</code>, get currently attached packages and objects; <code>attach()</code>, <code>detach()</code>, create an environment out of an object and attach to the search path;</li>
+<li>Namespace: <code>library()</code>, <code>require()</code>, load and attach add-on packages (in function); <code>getNamespace()</code>, namespace environment; <code>getNamespaceExports()</code>, exported names; <code>getNamespaceInfo()</code>, arbitrary info;</li>
+<li>Function: <code>environment()</code>, access the enclosure of a function, defaults to the current environment; <code>parent.frame()</code>, the calling environment;</li>
+<li>Virtual: <code>with()</code>, create an environment enclosed by the calling environment, evaluate expressions; <code>list2env()</code>, convert/add a list to an environment;</li>
+<li><code>.libPaths()</code>, access R library directories: “/usr/lib/R/library”, packages in the R distribution; “/usr/lib/R/site-library”, package installed system-wide; “/usr/local/lib/R/site-library”, packages installed by system administrator; “/home/ruda/lib/R”, user-installed packages;</li>
+</ul>
+<p>Objects:</p>
+<ul>
+<li><code>attributes()</code>, <code>attr()</code>, access all or a specific attribute of an object; <code>structure()</code> (pure), add attributes to an object;</li>
+<li><code>names()</code>, access the “names” attribute of an object;</li>
+<li><code>setNames()</code> (pure), set names to an object; <code>unname()</code> (pure), copy an object except its names;</li>
+<li><code>nrow()</code>, <code>ncol()</code>, get the number of rows (first dimension) or columns (second dimension) in a data.frame or array.</li>
+<li><code>dim()</code>, access dimensions of an object.</li>
+<li><code>dimnames()</code>, <code>rownames()</code>, <code>colnames()</code>, access dimension names of an object.</li>
+<li><code>class()</code>, access an object’s class; <code>unclass()</code>, return an object without the “class” attribute.</li>
+<li><code>summary()</code>, summarize an object.</li>
+<li><code>I()</code>, prepend object “class” with “AsIs”.</li>
+<li><code>format()</code>, format object for pretty printing.</li>
+<li><code>print()</code>, print and return invisibly (automatically called); <code>cat()</code>, concatenate and print objects.</li>
+<li><code>invisible()</code>, return an invisible copy of an object, often used on function return values.</li>
+<li><code>save()</code>, save R objects in a data file (common extensions: <code>.RData</code>, <code>.rda</code>).</li>
+<li><code>load()</code>, reload saved datasets (see <code>utils::data()</code>);</li>
+<li><code>dput()</code>, write an object to a file.</li>
+<li><code>sink()</code>, send output to a file.</li>
+</ul>
+<p>Predicate/logical functions:</p>
+<ul>
+<li><code>all.equal()</code>, test if objects are nearly equal.</li>
+<li><code>identical()</code>, test if objects are exactly equal.</li>
+<li><code>all()</code>, <code>any()</code>, n-ary logical conjunction/disjunction.</li>
+<li><code>duplicated()</code>, test if elements are duplicates of preceding ones; <code>anyDuplicated()</code>, wrapper of <code>any()</code> and <code>duplicated()</code>.</li>
+<li><code>inherits()</code>, test an object’s class.</li>
+</ul>
+<p>Index functions:</p>
+<ul>
+<li><code>which()</code>, index (matrix) of TRUE values; <code>which.min()</code>, <code>which.max()</code>, index of the first minimum/maximum of a numeric/logical vector.</li>
+<li><code>max.col()</code>, maximum position for each row of a matrix;</li>
+<li><code>match()</code>, positions elements first matched in a table; <code>pmatch()</code> partial match.</li>
+</ul>
+<h3 id="data-types">Data Types</h3>
+<p>Vector:</p>
+<ul>
+<li><code>typeof()</code>, object base type.</li>
+<li><code>length()</code>, object length; assignment form discards elements or fills in NA at the back.</li>
+<li><code>lengths()</code>, length of each element of a list.</li>
+<li><code>c()</code>, combine values (lists) into a vector (list); coercion rule applies.</li>
+<li><code>seq()</code> (generic), generate regular sequences; <code>seq_len()</code>, <code>seq_along()</code>, fast primitives for integer.</li>
+<li><code>rep()</code>, <code>rep_len()</code>, replicate elements of vectors and lists.</li>
+<li><code>rev()</code>, reverse elements.</li>
+<li><code>sort()</code>, sorting; <code>order()</code>, <code>rank()</code>, ranking with options for missing values and ties.</li>
+<li><code>intersect()</code>, <code>union()</code>, <code>setdiff()</code>, <code>setequal()</code>, set operations on vectors.</li>
+<li><code>duplicated()</code>, <code>unique()</code>, determine/remove duplicated elements.</li>
+<li><code>sample()</code>, <code>sample.int()</code>, sample from a vector or <code>seq(n)</code>.</li>
+<li><code>split()</code> (generic), split a vector/data.frame into a list of vectors/data.frames using a factor.</li>
+<li><code>expand.grid()</code>, create product set of one dimensional objects as a data.frame.</li>
+<li><code>table()</code>, compute contingency table (frequency counts).</li>
+<li><code>rle()</code>, run length encoding.</li>
+</ul>
+<p>Bit fields:</p>
+<ul>
+<li><code>bitwNot()</code>, <code>bitwAnd()</code>, <code>bitwOr()</code>, <code>bitwXor()</code>, bitwise logical operations;</li>
+<li><code>bitwShiftL()</code>, <code>bitwShiftR()</code>, bitwise shift operations;</li>
+</ul>
+<p>Numeric:</p>
+<ul>
+<li><code>abs()</code>, absolute value.</li>
+<li><code>sqrt()</code>, principal square root.</li>
+<li><code>exp()</code>, <code>log()</code>, <code>log10()</code>, <code>log2()</code>, logarithm and exponential functions; <code>log1p()</code>, <code>expm1()</code>, computes log(1+x) and exp(x)-1 accurately for |x| &lt;&lt; 1;</li>
+<li><code>cos()</code>, <code>sin()</code>, <code>tan()</code>, <code>acos()</code>, <code>asin()</code>, <code>atan()</code>, <code>atan2()</code>, trigonometric functions.</li>
+<li><code>ceiling()</code>, <code>floor()</code>, <code>round()</code>, <code>signif()</code>, <code>trunc()</code>, rounding of numbers.</li>
+<li><code>sign()</code>, sign function.</li>
+<li><code>range()</code>, extremes.</li>
+<li><code>max()</code>, <code>min()</code>, <code>mean()</code>, <code>prod()</code>, <code>sum()</code>, summary functions.</li>
+<li><code>pmax()</code>, <code>pmin()</code>, point-wise maxima or minima.</li>
+<li><code>cummax()</code>, <code>cummin()</code>, <code>cumprod()</code>, <code>cumsum()</code>, cumulative functions.</li>
+<li><code>diff()</code>, lagged and iterated differences.</li>
+<li><code>choose()</code>, <code>factorial()</code>, special math functions: combination and factorial.</li>
+<li><code>gamma()</code>, <code>lgamma()</code>, <code>digamma()</code>, <code>trigamma()</code>, <code>psigamma()</code>, <code>beta()</code>, <code>lbeta()</code>, Gamma and related special functions;</li>
+<li><code>besselJ()</code>,<code>besselY()</code>, <code>besselI()</code>, <code>besselK()</code>, Bessel functions of first and second kind, and modified Bessel functions of first and second kind;</li>
+<li><code>jitter()</code>, add a small amount of noise.</li>
+<li><code>Re()</code>, <code>Im()</code>, <code>Mod()</code>, <code>Arg()</code>, <code>Conj()</code>, complex number functions.</li>
+</ul>
+<p>Factor:</p>
+<ul>
+<li><code>levels()</code>, <code>nlevels()</code>, show the (number of) “levels” of an object.</li>
+<li><code>reorder()</code>, <code>relevel()</code>, reorder levels of a factor.</li>
+<li><code>cut()</code>, <code>findInterval()</code>, discretize a numeric vector by cut points.</li>
+<li><code>contrasts()</code>, access the “contrasts” associated with a factor (categorical variable), linear combinations of factor level means whose coefficients add up to zero.</li>
+<li><code>interaction()</code>, compute factor interactions (joint levels).</li>
+</ul>
+<p>Array/Matrix/data.frame:</p>
+<ul>
+<li><code>cbind()</code>, <code>rbind()</code>, combine objects into a matrix by column or by row (with data.frame method);</li>
+<li><code>merge()</code>, merge two data.frames (SQL join operations): ‘by’, ‘by.x’, ‘by.y’ specify joining columns, default to common column names; ‘all’, ‘all.x’, ‘all.y’ for full/left/right outer joins, defaults to inner join; ‘sort’ for sorting;</li>
+<li><code>subset()</code>, subset observations and variables.</li>
+<li><code>t()</code>, transpose a matrix or data.frame.</li>
+<li><code>aperm()</code>, permute an array.</li>
+<li><code>diag()</code>, access the diagonal of a matrix, or construct a diagonal matrix from a vector.</li>
+<li><code>crossprod()</code>, <code>tcrossprod()</code>, matrix crossproducts.</li>
+<li><code>norm()</code>, matrix norms: ‘1’, one norm (default); ‘i’, infinity norm; ‘f’, Frobenius norm; ‘m’, maximum modulus; ‘2’, spectral norm;</li>
+<li><code>solve()</code>, solve a system of equations, inverse of a square matrix;</li>
+<li><code>chol()</code>, Choleski decomposition (<span class="math inline">\(U^T U\)</span>) of a real positive-definite matrix, <code>pivot = TRUE</code> allows positive semi-definite matrices; <code>chol2inv()</code>, invert a positive-definite matrix using its Cholesky decomposition;</li>
+<li><code>eigen()</code>, <code>qr()</code>, <code>svd()</code>, matrix decompositions (eigenvalue, QR, SVD).</li>
+<li><code>rcond()</code>, approximately compute the reciprocal condition number.</li>
+<li><code>colMeans()</code>, <code>colSums()</code>, <code>rowMeans()</code>, <code>rowSums()</code>, column/row sums and means of arrays or data.frames.</li>
+<li><code>scale()</code>, scaling and centering; <code>sweep()</code>, apply a summary statistic on an array, default to subtraction.</li>
+<li><code>transform()</code>, transform a data.frame (like <code>dplyr::mutate</code>)</li>
+</ul>
+<p>Character:</p>
+<ul>
+<li><code>nchar()</code>, count number of characters.</li>
+<li><code>paste()</code>, <code>paste0()</code>, concatenate vectors as character (with zero padding), argument ‘collapse’ returns a single string (vector of length 1).</li>
+<li><code>tolower()</code>, <code>toupper()</code>, <code>chartr()</code>, translate characters.</li>
+<li><code>substr()</code>, access substrings of a character vector by position.</li>
+<li><code>strsplit()</code>, split a character vector into a list of substring vectors.</li>
+<li><code>grep()</code>, <code>grepl()</code>, <code>agrep()</code>, index/value or logical predicate of (approximate) string pattern matches.</li>
+<li><code>regexpr()</code>, <code>gregexpr()</code>, position and length of (global) string pattern matches.</li>
+<li><code>sub()</code>, <code>gsub()</code>, substitute (global) string pattern matches.</li>
+<li><code>regmatches()</code>;</li>
+<li><code>trimws()</code>, remove leading and/or trailing whitespace.</li>
+<li><code>sprintf()</code>, C-style String Formatting Commands.</li>
+<li><code>Encoding()</code>, access the declared encodings of the elements of a character vector: “unknown”, undeclared; “UTF-8”; “latin1”, Windows Latin 1 (ANSI); “bytes”, non-text;</li>
+<li><code>enc2native()</code>, <code>enc2utf8()</code>, convert the encodings of a character vector to native/UTF-8;</li>
+<li><code>iconv()</code>, convert a character vector between encodings: “ASCII//TRANSLIT”, transliteration to ASCII characters;</li>
+</ul>
+<p>List:</p>
+<ul>
+<li><code>unlist()</code>, recursively unpack a list to an atomic vector; coercion rule applies.</li>
+</ul>
+<p>Date and date-time classes:</p>
+<ol type="1">
+<li><strong>Date</strong>, calendar dates, number of days since 1970-01-01 UTC.</li>
+<li><strong>POSIXt</strong>, a virtual class for POSIX date-time.
+<ol type="1">
+<li><strong>POSIXct</strong>, POSIX calendar time, number of seconds since 1970-01-01 UTC. (<code>print()</code> method takes argument <code>tz</code> for time zone.)</li>
+<li><strong>POSIXlt</strong>, POSIX local time.
+<ul>
+<li>list components: ‘sec’, ‘min’, ‘hour’, ‘mday’ (day of month), ‘mon’, ‘year’ (years since 1900), ‘wday’ (day of week), ‘yday’ (day of year), ‘isdst’ (daylight-saving time);</li>
+<li>attributes: “tzone” (timezone);</li>
+</ul></li>
+</ol></li>
+<li><strong>difftime</strong>, time difference with a “units” attribute.</li>
+</ol>
+<p>Date and date-time functions:</p>
+<ul>
+<li>Encoding/Formatting:
+<ul>
+<li><code>strptime()</code>, Parse string to “POSIXlt” objects.</li>
+<li><code>strftime()</code>, Format date-time objects to string via “POSIXlt”: <code>format.POSIXlt(as.POSIXlt(x))</code>.</li>
+<li><code>ISOdate()</code>, <code>ISOdatetime()</code>, create “POSIXct” objects from numeric values.</li>
+</ul></li>
+<li>Coercion functions: <code>as.Date()</code>, <code>as.POSIXct()</code>, <code>as.POSIXlt()</code>.</li>
+<li>Extraction:
+<ul>
+<li><code>weekdays()</code>, <code>quarters()</code>, <code>months()</code>;</li>
+<li><code>julian()</code>, Julian day (fractions days since some origin, with 86400 parts per unit, ignoring leap seconds);</li>
+<li><code>units()</code>, access units of a “difftime” object;</li>
+</ul></li>
+<li>Operation: <code>difftime()</code>;</li>
+<li>Convenience functions:
+<ul>
+<li><code>Sys.Date()</code>, <code>Sys.time()</code>, get current date/date-time.</li>
+<li><code>date()</code>, print current date-time.</li>
+</ul></li>
+</ul>
+<p>Date-time format string: (see <code>?strptime</code> for details) - Default to “%Y-%m-%d %H:%M:%S” for date-times and “%Y-%m-%d” for dates; - Conversion specifications shall conform to POSIX 1003.1-2008 standard, but implementations are platform-specific: - <code>%Y</code>, year with century (0:9999); - <code>%m</code>, month as decimal number (01-12); - <code>%d</code>, day of the month as decimal number (01-31); - <code>%H</code>, hours as decimal number (00-23); - <code>%M</code>, minute as decimal number (00-59); - <code>%S</code>, second as integer (00-61), allowing for up to two leap-seconds; - Locale-specific conversions are used where appropriate and available, accessible with <code>Sys.getlocale("LC_TIME")</code> and <code>Sys.setlocale("LC_TIME", "en_US.UTF-8")</code>. - <code>%b</code>, abbreviated month name in the current locale on this platform; - <code>%p</code>, AM/PM indicator in the locale, used in conjunction with <code>%I</code> and not with <code>%H</code>;</p>
+<h3 id="functional-programming">Functional Programming</h3>
+<p>Expression: (non-standard evaluation)</p>
+<ul>
+<li><code>quote()</code>, returns its argument (“call”);</li>
+<li><code>call()</code>, <code>expression()</code> create a ‘call’/‘expression’ object (including math symbols).</li>
+<li><code>substitute()</code>, returns the parse tree (modified expression) for the unevaluated expression: name - value; promise - expression; ‘…’ - expression; otherwise behaves like <code>quote()</code>.</li>
+<li><code>deparse()</code>, turn unevaluated expressions into character strings.</li>
+<li><code>eval()</code>, evaluate an unevaluated expression in a specified environment.</li>
+<li><code>all.names()</code>, <code>all.vars()</code>, extract all the names/variables in an expression or call.</li>
+</ul>
+<p>There’s a general tension between functions that are designed for interactive use (using <code>substitute()</code> to reduce typing) and functions that are safe to program with (called from another function). <em>Escape hatch</em> of a function using non-standard evaluation is its alternative version that takes already quoted expressions and uses standard evaluation.</p>
+<p>Function as object:</p>
+<ul>
+<li><code>formals()</code>, <code>body()</code>, access the formal arguments and body of a function.</li>
+<li><code>environment()</code>, access the enclosure of a function (“closure”).</li>
+<li><code>match.fun()</code>, extract a function specified by name;</li>
+</ul>
+<p>Functions as keywords:</p>
+<ul>
+<li><code>function() {}</code>, define a function.</li>
+<li><code>missing()</code>, test unaltered name.</li>
+<li><code>force()</code>, force evaluation of a formal argument: <code>function(x) x</code>.</li>
+<li><code>return()</code>, explicitly return values.</li>
+<li><code>on.exit()</code>, function exit code, useful for undoing side effects.</li>
+</ul>
+<p>Functionals:</p>
+<ul>
+<li><code>replicate()</code>, repeatedly evaluate an expression.</li>
+<li><code>apply()</code>, apply a function to margins of a matrix/array: 1, rows; 2, columns; 3…;</li>
+<li><code>lapply()</code>, <code>sapply()</code> (recommended only for interactive use), <code>vapply()</code>, apply a function to a list (and simplify) or a vector.</li>
+<li><code>tapply()</code>, apply a function to vector grouped by types (a combination of <code>split()</code> and <code>sapply()</code>).</li>
+<li><code>Map()</code>, <code>mapply()</code> (unrecommended), iterate a function over multiple input data structures (and simplify).</li>
+<li><code>Reduce()</code>, reduces a vector to a single value by recursively calling a two-argument function.</li>
+<li><code>Filter()</code>, selects only elements that match a predicate.</li>
+<li><code>do.call()</code>, apply a list of arguments to a function.</li>
+</ul>
+<p>Function operators:</p>
+<ul>
+<li><code>Vectorize()</code>, parallelize a function with respect to the arguments specified.</li>
+<li><code>Negate()</code>, negate a predicate function.</li>
+</ul>
+<p>Debug:</p>
+<ul>
+<li><code>stop()</code>, <code>warning()</code>, <code>message()</code>, throw error, warning, or diagnostic message.</li>
+<li><code>stopifnot()</code>, evaluate logical expressions and throw error on first FALSE; useful in regression tests and argument checking in functions.</li>
+<li><code>gtry()</code>, <code>tryCatch()</code>, catch errors or custom handlers and recover.</li>
+<li><code>traceback()</code>, print call stacks of the last uncaught error.</li>
+<li><code>browser()</code>, inspect the current environment interactively: <code>n</code>, execute the next command; <code>s</code>, step into the next function; <code>f</code>, finish the current loop or function; <code>c</code>, continue execution normally; <code>Q</code>, stop the function and return to the console.</li>
+<li><code>debug()</code>, <code>debugonce()</code>, debug a function.</li>
+<li><code>suppressWarnings()</code>, evaluates an expression in a context that ignores all warnings.</li>
+</ul>
+<h2 id="utilities-utils">Utilities <code>utils</code></h2>
+<ul>
+<li><code>?</code> or <code>help()</code>, show documentation on a name or package.</li>
+<li><code>??</code> or <code>help.search()</code>, search documentation.</li>
+<li><code>apropos()</code>, <code>find()</code>, find objects by (partial) name.</li>
+<li><code>RSiteSearch()</code>, search site http://search.r-project.org for key words or phrases in documentation.</li>
+<li><code>example()</code>, <code>demo()</code>, run examples code or demo script.</li>
+<li><code>browseVignettes()</code>, see vignettes of a package.</li>
+<li><code>vignette()</code>, get/view/list package vignettes.</li>
+<li><p><code>citation()</code>, cite R and R packages in publications.</p></li>
+<li><code>installed.packages()</code>, extract info from DESCRIPTION files of installed packages into a matrix.</li>
+<li><code>install.packages()</code>, install packages.</li>
+<li><code>old.packages()</code>, <code>update.packages()</code>, list/update installed packages with available updates: <code>lib.loc=.libPaths()[[1]]</code>, <code>ask=FALSE</code>, <code>checkBuilt=TRUE</code>;</li>
+<li><code>remove.packages()</code>, remove installed packages.</li>
+<li><code>download.file()</code>, download a file from the Internet.</li>
+<li><p><code>Sweave()</code>, automatic report generation.</p></li>
+<li><code>recover()</code>, browse on a currently active function call.</li>
+<li><p><code>capture.output()</code>, send output to a character string or file.</p></li>
+<li><code>str()</code>, compactly display the structure of an object.</li>
+<li><code>head()</code>, <code>tail()</code>, truncated view of an object.</li>
+<li><p><code>combn()</code>, generate all combinations from a vector.</p></li>
+<li>(obsolete) <code>data()</code>, load data sets, defaults to list the available data sets; This function was designed to avoid having large data sets in memory when not in use, which has been almost entirely superseded by lazy-loading of data sets.</li>
+<li><code>count.fields()</code>, count the number of fields per line.</li>
+<li><code>read.csv()</code>, <code>write.csv()</code>, <code>read.delim()</code>, <code>write.delim()</code>, tabular data I/O.</li>
+<li><code>read.fwf()</code>, read fixed width format files.</li>
+<li><p><code>write()</code>, write data to a file.</p></li>
+<li><code>methods()</code>, list all S3 and S4 methods/generics associated with a generic/class.</li>
+<li><code>getS3method()</code>, get a method for an S3 generic.</li>
+<li><p><code>getAnywhere()</code>, get objects by name from loaded namespaces.</p></li>
+<li><code>adist()</code>, approximate string distance matrix (Levenshtein distance).</li>
+<li><p><code>URLencode()</code>, <code>URLdecode()</code>, percent-encoding or decoding a URI.</p></li>
+</ul>
+<h2 id="statistical-models-stats">Statistical Models <code>stats</code></h2>
+<p>Plots:</p>
+<ul>
+<li><code>scatter.smooth()</code>, scatter plot with loess curve.</li>
+<li><code>interaction.plot()</code>, plot mean response of two-way combinations of factors.</li>
+<li><code>termplot()</code>, plot (partial) effects of a regression model;</li>
+<li><code>qqnorm()</code>, <code>qqplot()</code>, <code>qqline()</code>, normal and data quantile-quantile plots and reference line;</li>
+</ul>
+<p>Mathematical functions:</p>
+<ul>
+<li><code>poly()</code>, evaluate orthogonal polynomials at specified points, or as regression formula;</li>
+<li><code>approx()</code>, <code>approxfun()</code>, linear/constant interpolation;</li>
+<li><code>spline()</code>, <code>splinefun()</code>, spline interpolation;</li>
+<li><code>density()</code>, kernel density estimation;</li>
+<li><code>ecdf()</code>, empirical CDF, with explict plot method <code>plot.ecdf()</code>: ‘verticals’, ‘do.points’;</li>
+</ul>
+<p>Mathematical functionals:</p>
+<ul>
+<li><code>stepfun()</code>, create step functions.</li>
+<li><code>integrate()</code>, numerical integration.</li>
+<li><code>uniroot()</code>, find a root of a univariate function within an interval.</li>
+<li><code>optimize()</code>, <code>optim()</code>, find the optimal point of a univariate/multivariate function, where option <code>method</code> takes value “Nelder-Mead” (default), “CG” (conjugate gradients), “BFGS”(Broyden–Fletcher–Goldfarb–Shanno), “L-BFGS-B” (limited-memory BFGS with box constraints).</li>
+<li><code>nlm()</code>, Newton-type non-linear minimization;</li>
+<li><code>D()</code>, simple symbolic derivatives; <code>deriv()</code>, algorithmic derivatives.</li>
+</ul>
+<p>Probability distributions:</p>
+<ol type="1">
+<li>prefixes:
+<ul>
+<li><code>r-</code>, random number generator;</li>
+<li><code>d-</code>, density function; <code>p-</code>, distribution function; <code>q-</code>, quantile function;</li>
+</ul></li>
+<li>parametric probabilistic models:
+<ul>
+<li>from discrete process: <code>binom</code>, <code>nbinom</code>, <code>geom</code>, <code>hyper</code>; <code>multinom</code>; <code>beta</code>;</li>
+<li>from continuous process: <code>unif</code>; <code>pois</code>, <code>exp</code>, <code>gamma</code>;</li>
+<li>from asymptotic process: <code>norm</code>, <code>chisq</code>, <code>t</code>, <code>cauchy</code>, <code>f</code>, <code>tukey</code>; <code>lnorm</code>; <code>weibull</code>;</li>
+<li>other distributions: <code>logis</code>; <code>wilcox</code>, <code>signrank</code>;</li>
+<li><code>birthday</code>, birthday paradox;</li>
+</ul></li>
+<li>others:
+<ul>
+<li><code>RNGkind()</code>, access the type of random number generator (RNG) used: “Wichmann-Hill” (1982); Super-Duper" (1970s), “Marsaglia-Multicarry” (1997); “Knuth-TAOCP” (1997), “Knuth-TAOCP-2002” (2002); “Mersenne-Twister” (default; 1998); “L’Ecuyer-CMRG” (1999); “user-supplied”.</li>
+</ul></li>
+</ol>
+<p>Statistics:</p>
+<ul>
+<li><code>median()</code>, <code>quantile()</code>, <code>sd()</code>, <code>var()</code>, <code>cor()</code>, summary statistics.</li>
+<li><code>ftable()</code>, flat contingency table; <code>xtabs()</code>, cross tabulation;</li>
+<li><code>ave()</code>, group averages, repeated for each element.</li>
+<li><code>aggregate()</code>, group observations by a factor and compute summary statistics.</li>
+<li><code>weighted.mean()</code>, weighted arithmetic mean;</li>
+</ul>
+<p>Hypothesis tests:</p>
+<ul>
+<li><code>t.test()</code>, one and two sample t-tests;</li>
+<li><code>var.test()</code>, F-test on variances of two normal samples.</li>
+<li><code>pairwise.t.test()</code>, <code>power.t.test()</code>;</li>
+<li><code>binom.test()</code>, <code>prop.test()</code>;</li>
+</ul>
+<p>Time-series:</p>
+<ul>
+<li>Time-series objects <code>ts()</code> (‘ts’ and subclass ‘mts’):
+<ul>
+<li>Attribute <code>tsp()</code>, time-series properties: <code>start()</code>, start time; <code>end()</code>, end time; and <code>frequency()</code>, where values of 4 and 12 are assumed to imply quarterly and monthly series.</li>
+<li><code>time()</code>, sampling time.</li>
+<li><code>window()</code>, subset with a time window, the only proper way to subset a ‘ts’ object.</li>
+<li><code>ts.plot()</code>, plot multiple time-series on the same axis; <code>plot.ts()</code>.</li>
+<li><code>ts.union()</code>, <code>ts.intersect()</code>, bind time series of common frequency.</li>
+</ul></li>
+<li>Modeling:
+<ul>
+<li>Running Medians: <code>runmed()</code>, <code>smooth()</code>;</li>
+<li>Moving Average: <code>kernel()</code>, <code>kernapply()</code>, create/apply a discrete symmetric normalized smoothing kernel (class ‘tskernel’);</li>
+<li>Autoregressive Models: <code>ar()</code>, <code>arima()</code>;</li>
+<li>Seasonal Decomposition (Trend-Cyclical, Seasonal, Irregular): <code>stl()</code>, decompose by LOESS; <code>decompose()</code>, classical decomposition by moving average.</li>
+<li><code>filter()</code>, linear filtering;</li>
+</ul></li>
+<li>Time Domain Analysis:
+<ul>
+<li><code>lag()</code>, <code>lag.plot()</code>, lag and lag plots;</li>
+<li><code>acf()</code>, <code>pacf()</code>, (partial) autocorrelation/autocovariance function;</li>
+<li><code>ccf()</code>, cross-correlation function.</li>
+</ul></li>
+<li>Spectral Density Estimation <code>spectrum()</code>:
+<ul>
+<li>Preparation (optional): <code>spec.taper()</code>, taper a time series by a cosine bell (window function).</li>
+<li><code>fft()</code>, <code>mvfft()</code>, discrete Fourier transform of one or multiple arrays by the FFT algorithm;</li>
+<li><code>spec.pgram()</code>, <code>cpgram()</code>, (cumulative) periodogram (modulus-squared of FFT) with smoothing options.</li>
+<li><code>spec.ar()</code>, autoregressive model (AR) estimation.</li>
+</ul></li>
+<li><code>convolve()</code>, convolutions of two sequences by FFT;</li>
+<li><code>embed()</code>, embed a time series into a low-dimensional Euclidean space;</li>
+</ul>
+<p>Data prep:</p>
+<ul>
+<li><code>reshape()</code>, reshape a data.frame.</li>
+<li><code>complete.cases()</code>, check observations without missing values (across a sequence).</li>
+<li><code>na.omit()</code>/<code>na.exclude()</code>, <code>na.fail()</code>, <code>na.pass()</code>, handle missing values: throw NA/error/nothing.</li>
+<li><code>model.matrix()</code>, create a design/model matrix: expanding factors and interactions to dummy variables using the contrasts.</li>
+</ul>
+<h3 id="unsupervised-learning">Unsupervised Learning</h3>
+<p>Principal components analysis (PCA):</p>
+<ul>
+<li><code>prcomp()</code>, Q-mode PCA (preferred for numerical accuracy), SVD on the data matrix/data.frame: <code>center</code>, <code>scale</code>, whether to standardize data before PCA; <code>tol</code>, <code>rank</code>, minimum relative standard deviation or maximum rank of included principal components; returns a list with <code>sdev</code> the standard deviations of the principal components (variances divided by N-1), <code>rotation</code> the matrix of variable loadings (eigenvectors, with arbitrary signs), <code>x</code> rotated data (disable with <code>retx = FALSE</code>), <code>center</code>, <code>scale</code>;</li>
+<li><code>princomp()</code>, R-mode PCA, eigenvalue decomposition on the covariance matrix of the data, feature extraction of variables;</li>
+<li><code>screeplot()</code>, plot the variances against the indexes of principal components;</li>
+<li><code>biplot()</code>, plot of the first two principal components;</li>
+</ul>
+<p>Clustering:</p>
+<ul>
+<li><code>kmeans()</code>, k-means clustering;</li>
+<li><code>hclust()</code>, hierarchical clustering; <code>cutree()</code>, cut a cluster tree into groups of data;</li>
+<li><code>dist()</code>, compute the distance matrix for rows of a data.frame, return a <code>dist</code> object storing the lower triangle;</li>
+</ul>
+<h3 id="regression">Regression</h3>
+<p>Model family:</p>
+<ul>
+<li><code>lm()</code>, <code>glm()</code>, (generalized) linear model.</li>
+<li><code>nls()</code>, nonlinear models.</li>
+<li><code>loess()</code>, local polynomial regression <span class="citation" data-cites="Chambers1991">[@Chambers1991, Chap. 8]</span>:
+<ul>
+<li><code>span</code>, smoothness parameter;</li>
+<li><code>degree</code>, 1 (default) or 2, higher orders of polynomial are not recommended;</li>
+<li><code>family</code>: “gaussian”, fit by least-squares; “symmetric”, re-descending M estimator (smoother);</li>
+<li><code>control = loess.control()</code>, control parameters: <code>surface</code>, interpolate (default) or computed exactly the fitted surface;</li>
+</ul></li>
+<li><code>loess.smooth()</code>, evaluate of the loess curve on equally spaced points covering the range of x;</li>
+<li><code>smooth.spline()</code>, cubic smoothing spline fit and cross-validation;</li>
+<li><code>ar()</code>, autoregressive (AR) models;</li>
+<li><code>aov()</code>, analysis of variance (ANOVA) model;</li>
+</ul>
+<p>Fitted models:</p>
+<ul>
+<li><code>formula()</code>, extract model form.</li>
+<li><code>terms()</code>, extract model ‘terms’ from objects.</li>
+<li><code>model.frame()</code>, extract a data.frame from data based on a formula.</li>
+<li><code>model.extract()</code>, extract components from a model frame (<code>model.response()</code>, response; <code>model.weights()</code>, weights; <code>model.offset()</code>, offset; “subset”).</li>
+<li><code>coefficients()</code>/<code>coef()</code>, <code>confint()</code>, extract fitted model coefficients and confidence intervals.</li>
+<li><code>fitted()</code>, <code>residuals()</code>/<code>resid()</code>, extract model fitted values and residuals.</li>
+<li><code>predict()</code>, make predictions with model.</li>
+<li><code>naresid()</code>, <code>napredict()</code> residuals and predictions adjusted for missing values.</li>
+<li><code>anova()</code>, <code>df.residual()</code>, <code>deviance()</code>, <code>logLik()</code>, extract analysis of variance table, residual degree of freedom, model deviance, and log-likelihood.</li>
+<li><code>AIC()</code>, <code>BIC()</code>, information criteria;</li>
+<li><code>vcov()</code>, compute variance-covariance matrix.</li>
+<li><code>summary.aov()</code>, summarize an ANOVA model.</li>
+<li><code>update()</code>, update model call and re-fit.</li>
+</ul>
+<p>Model diagnostics:</p>
+<ul>
+<li><code>influence()</code>, <code>lm.influence()</code></li>
+<li><code>influence.measures()</code>, regression leave-one-out deletion diagnostics: DFBETAS for each model variable, DFFITS, covariance ratios, Cook’s distances and the diagonal elements of the hat matrix {Belsley, Kuh and Welsch (1980)}, {Cook and Weisberg (1982)};
+<ul>
+<li><code>rstandard()</code>, compute standardized residuals.</li>
+<li><code>hatvalues()</code>, compute hat values.</li>
+</ul></li>
+</ul>
+<h2 id="example-datasets-datasets">Example Datasets <code>datasets</code></h2>
+<ul>
+<li>‘airquality’, New York Air Quality Measurements.</li>
+<li>‘faithful’, Old Faithful Geyser Data.</li>
+<li>‘iris’, Edgar Anderson’s Iris Data.</li>
+<li>‘mtcars’, Motor Trend Car Road Tests.</li>
+<li>‘presidents’, Quarterly Approval Ratings of US Presidents.</li>
+<li>‘warpbreaks’, The Number of Breaks in Yarn during Weaving.</li>
+</ul>
+<h2 id="base-graphics-graphics">Base graphics <code>graphics</code></h2>
+<p>You might have seen these functions from <code>graphics</code>:</p>
+<ul>
+<li>1DOF: <code>pie()</code>, <code>dotchart()</code>, <code>barplot()</code>; <code>hist()</code>, <code>stripchart()</code>, <code>boxplot()</code>;</li>
+<li>2DOF: <code>plot()</code>; <code>sunflowerplot()</code>; <code>curve()</code>;</li>
+<li>3DOF: <code>persp()</code>; <code>contour()</code>, <code>filled.contour()</code>; <code>smoothScatter()</code>, <code>image()</code>;</li>
+<li>nDOF: <code>symbols()</code>, circles, squares, stars (also <code>stars()</code>), rectangles, boxplots, thermometers: <code>inches</code>, the largest dimension of any symbol in inches (default to TRUE/1), if FALSE, the units correspond to the appropriate axes (x axis for circles, squares, stars; y axis for whiskers of boxplots); <code>fg</code>, <code>bg</code>, foreground/stroke and background/fill colors;</li>
+<li>groups: <code>matplot()</code>; <code>matlines()</code>, <code>matpoints()</code>;</li>
+<li>facets:
+<ul>
+<li><code>pairs()</code>, scatterplot matrix: <code>gap=0</code>; <code>lower.panel=panel.smooth</code>, <code>upper.panel=panel.cor</code>, <code>diag.panel=panel.hist</code>, panel functions for lowess regression, correlation coefficient, and histogram (defined in <code>?pairs</code>; use <code>purrr::partial()</code> to avoid argument collapse);</li>
+<li><code>coplot()</code>, conditioning plots;</li>
+</ul></li>
+<li>addition: <code>rug()</code>, <code>points()</code>; <code>lines()</code>, <code>abline()</code>; <code>segments()</code>, <code>arrows()</code>; <code>rect()</code>, <code>polygon()</code>, shading; <code>text()</code>;</li>
+<li>annotation: <code>axis()</code>, <code>axTicks()</code>, <code>grid()</code>, <code>legend()</code>, <code>title()</code>, <code>mtext()</code>;</li>
+</ul>
+<p>Graphical parameters <code>par()</code>: (Format: <code>p = v</code>, set value; <code>"p"</code>, query value;)</p>
+<ul>
+<li>global:
+<ul>
+<li><code>mfrow</code>, <code>mfcol</code>, multiple figures (rows, cols) plotted by row/column;</li>
+<li><code>mar</code>, <code>mai</code>, margins (bottom, left, top, right) in lines/inches;</li>
+<li><code>oma</code>, <code>omi</code>, outer margin area in lines/inches;</li>
+<li><code>mgp</code>, <code>xaxp</code>, <code>yaxp</code>, margin/axes positioning;</li>
+<li><code>tck</code>, <code>tcl</code>, tick mark length;</li>
+<li><code>fg</code>, <code>bg</code>, foreground/background colors;</li>
+<li><code>xpd</code>, clip plot to device;</li>
+<li><code>fig</code>, normalized device coordinates (NDC) of the figure region;</li>
+<li><code>new</code>, if add to an existing plot as an inset;</li>
+</ul></li>
+<li>non-global:
+<ul>
+<li><code>type</code>, plot type: ‘n’, null; ‘p’, point; ‘l’, ‘o’, ‘b’, ‘c’, lines; ‘s’, ‘S’, steps; ‘h’, height;</li>
+<li><code>lty</code>, line type: 1, solid; 2, dashed; 3, dotted; 4, dot dash; 5, long dash; 6, two dash;</li>
+<li><code>bty</code>, box type: ‘o’ (default), ‘n’ (suppress), ‘l’, ‘7’, ‘c’, ‘u’, ‘]’;</li>
+<li><code>pch</code>, plotting character (0-25): 19, solid dot; ‘.’, small dot; 21-25 accept <code>bg</code> color;</li>
+<li><code>cex</code>, character expansion: <code>cex.axis</code>, <code>cex.lab</code>, <code>cex.main</code>, <code>cex.sub</code>;</li>
+<li><code>xaxs</code>, <code>yaxs</code>, axis: ‘i’, internal (exact limits, no padding); ‘r’, regular;</li>
+<li><code>xlab</code>, <code>ylab</code>, axis labels;</li>
+<li><code>xaxt</code>, <code>yaxt</code>, axis lines: ‘n’, suppress one axis; <code>axes</code>: FALSE, suppress both (with other effects);</li>
+<li><code>asp</code>, y-x aspect ratio, a positive number, overrides “xlim” and “ylim”;</li>
+<li><code>las</code>, label style: 0, parallel to axis; 1, horizontal; 2, perpendicular to axis; 3, vertical;</li>
+<li><code>lpars</code>, list of graphical parameters;</li>
+<li><code>adj</code>, text adjustment: 0, left; .5, center; 1, right;</li>
+<li><code>font</code>, font type: 1, normal; 2, bold; 3, italic; 4, bold italic;</li>
+</ul></li>
+<li>call with no argument</li>
+</ul>
+<h2 id="graphic-devices-grdevices">Graphic devices <code>grDevices</code></h2>
+<p>Graphics drivers:</p>
+<ul>
+<li>raster graphics: <code>png()</code>, <code>bmp()</code>, <code>tiff()</code>, <code>jpg()</code>;</li>
+<li>“vector graphics”: <code>svg()</code>, renders text as individual raster polygons (use <code>svglite</code> instead).</li>
+<li>graphics for print: <code>postscript()</code>, EPS compatible; <code>pdf()</code>;</li>
+</ul>
+<p>Graphics control:</p>
+<ul>
+<li><code>dev.new()</code>, open a new device;</li>
+<li><code>dev.off()</code>, shut down the specified graphics device (default to the current);</li>
+<li><code>graphics.off()</code>, shut down all open graphics devices;</li>
+<li><code>dev.list()</code>, <code>dev.cur()</code>, <code>dev.next()</code>, <code>dev.prev()</code>, show all/current/next/previous device;</li>
+<li><code>dev.set()</code>, make a specific device active;</li>
+<li><code>savePlot()</code>, save Cairo X11 plot to file;</li>
+</ul>
+<p>Colors: <a href="colors.pdf">R color cheat sheet</a></p>
+<ul>
+<li>Names: <code>colors()</code>, built-in color names;</li>
+<li>Palettes:
+<ul>
+<li><code>rainbow()</code>, the hue wheel, useful for encoding angle or periodic variables: check that <code>identical(substr(rainbow(12), 1, 7), hsv(0:11/12))</code>;</li>
+<li><code>heat.colors()</code>, yellow-red; <code>cm.colors()</code>, cyan-magenta; <code>bpy.colors()</code>, black-blue-purple-yellow;</li>
+<li><code>terrain.colors()</code>, the classic elevation palette; <code>topo.colors()</code>, similar to terrain.colors;</li>
+</ul></li>
+<li>Color spaces: <code>gray()</code>, <code>rgb()</code>, <code>hsv()</code>, <code>hcl()</code>, grayscale/RGB/HSV/HCL coordinates with alpha value;</li>
+<li><code>col2rgb()</code>, convert color names, palette index, or hexadecimal string to 24-bit RGB values;</li>
+<li><code>colorRampPalette()</code>, interpolate a color palette, a function factory;</li>
+</ul>
+<h2 id="tools-for-package-development-tools">Tools for Package Development <code>tools</code></h2>
+<ul>
+<li><p><code>toTitleCase()</code>, convert a character vector to title case: principal words are capitalized; common words are lowercased; unchanged are quoted, capitalized, or conventional mixed-case words, and a few technical terms.</p></li>
+<li><code>md5sum()</code></li>
+<li><p><code>checkMD5sums()</code></p></li>
+<li><p><code>getVignetteInfo()</code></p></li>
+<li><p><code>Rcmd()</code></p></li>
+<li><code>dependsOnPkgs()</code>, find reverse dependencies of a package among installed packages;</li>
+<li><p><code>package_dependencies()</code>, ;</p></li>
+</ul>
+</body>
+</html>
