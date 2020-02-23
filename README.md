@@ -8,14 +8,18 @@ programs-and-activities/2019-2020-education-and-outreach-programs-and-workshops/
 
 ### Install R 
 
-1. Download the most recent version of R at <https://cran.r-project.org>.
+1. Download the current release version (3.6.2) of R at <https://cran.r-project.org>.
+    - Windows: <https://cran.r-project.org/bin/windows/base/>,
+    download [R-3.6.2-win.exe](https://cran.r-project.org/bin/windows/base/R-3.6.2-win.exe).
+    - Mac OS: <https://cran.r-project.org/bin/macosx/>,
+    download [R-3.6.2.pkg](https://cran.r-project.org/bin/macosx/R-3.6.2.pkg).
+    - Linux: <https://cran.r-project.org/bin/linux/>, see directions for each distribution.
 2. Start the R program:
-    - on Windows and MacOS, this will usually mean double-click on the R application.
-    - on Ubuntu and other UNIX-like systems, type `R` at a shell prompt.
+    - Windows and MacOS: double-click on the R application.
+    - Ubuntu and other UNIX-like systems: type `R` at a shell prompt.
  
 ### Install RStudio
 
-1. Go to RStudio's website <https://www.rstudio.com/products/rstudio/download/>.
-2. Click on "Download RStudio Desktop".
-3. Click on versions recommended for your system.
-
+1. Go to RStudio download page <https://rstudio.com/products/rstudio/download/#download>.
+2. Download the "RStudio Desktop" installer for your operating system.
+3. Install and open RStudio.
