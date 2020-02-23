@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Ruda Zhang" />
+  <title>R Data Table</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/table.css" />
+  <link rel="stylesheet" href="/home/ruda/lib/pandoc/css/pandoc.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">R Data Table</h1>
+<p class="author">Ruda Zhang</p>
+</header>
+<p><strong><code>data.table</code></strong>, in-memory columnar structure that efficiently handles GB-range data, with a succinct subset-transform-aggregate syntax. <a href="https://github.com/Rdatatable/data.table/wiki">Hosted on GitHub</a>, with main contributors Matt Dowle and Arun Srinivasan. Limitations: single node; (mostly) single threaded; up to 2 billion rows (2^31; limited by R data.frame int32 indexing). data.table never has or uses rownames. <a href="https://psyarxiv.com/u8ekc/">List-columns in data.table</a>: <code>by</code>, <code>purrr::map*()</code>.</p>
+<ul>
+<li>I/O: <code>fread()</code>, <code>fwrite()</code>, fast file reader and parallelized writer.</li>
+<li>Assignment: (by reference)
+<ul>
+<li><code>:=</code>, column operation by reference (<code>LHS := RHS</code> assigns a list to a character vector of column names, once only; <code>NULL</code> removes the column; functional form is of course supported; supports subset assignment by join; results returned invisibly);</li>
+<li><code>setDT()</code>, coerce lists and data.frames to data.table by reference; <code>as.data.table()</code>, the same, but by value;</li>
+<li><code>setnames()</code>, column names;</li>
+<li><code>setkey()</code>, radix-sorted primary index (in-memory order hierarchy), much faster than vector scan in subsetting (O(log N) vs O(N); currently for equi-join only);</li>
+<li><code>setindex()</code>, create secondary index (physical order vector).</li>
+<li><code>setcolorder()</code>, <code>setorder()</code>, column and row ordering;</li>
+<li><code>set()</code>, assignment by reference (in a loop), cannot handle grouping;</li>
+</ul></li>
+<li>One-table operations:
+<ul>
+<li><code>melt()</code>, use helper function <code>patterns()</code> to match column names;</li>
+<li><code>dcast()</code>, accepts formula (id ~ measure), argument ‘fun.aggregate’ takes a function to aggregate table by id variables.</li>
+<li><code>unique()</code>, dedupe;</li>
+</ul></li>
+<li>Two-table operations:
+<ul>
+<li>Joins with <code>merge()</code>: ‘by.x’, ‘by.y’, specify the joining columns with character vectors; ‘all’, ‘all.x’, ‘all.y’, logical for outer joins;</li>
+<li><code>CJ()</code>, cross/Cartesian join (sorted by default); <code>SJ()</code>, sorted join (set key on all columns);</li>
+<li>Overlap joins: <code>foverlaps()</code>;</li>
+<li>Set operations on data.tables: <code>fintersect()</code>, <code>funion()</code>, <code>fsetdiff()</code>, <code>fsetequal()</code>.</li>
+</ul></li>
+<li>List operations:
+<ul>
+<li><code>split()</code>, processing a list of data.tables is in general much slower than by groups in a data.table;</li>
+<li><code>rbindlist()</code>, stack a list of data.tables/data.frames.</li>
+<li><code>transpose()</code>, efficiently transpose list, data.frame and data.table.</li>
+</ul></li>
+<li>Column functions:
+<ul>
+<li><code>.()</code> and <code>J()</code> are both equivalent to <code>list()</code> and result in a data.table; J is for join, which is a data.table query on ‘i’;</li>
+<li><code>order()</code>, radix based ordering;</li>
+<li><code>uniqueN()</code>, fast <code>nrow(unique())</code>, no intermediate data.table materialized;</li>
+<li><code>shift()</code>, fast lead/lag for vectors and lists;</li>
+<li><code>chmatch()</code>, function called by shorthand <code>%chin%</code>;</li>
+<li><code>tstrsplit()</code>, convenience wrapper for <code>transpose(strsplit())</code>, useful for assigning split strings to individual columns;</li>
+<li><code>rleid()</code>, run-length type id for grouping;</li>
+<li><code>IDateTime()</code>, <code>as.IDate()</code>, <code>as.ITime()</code>, <code>wday()</code>, etc.: integer based date-time classes (‘IDate’, ‘ITime’), the encoder returns two columns.</li>
+</ul></li>
+<li>Infix column functions:
+<ul>
+<li><code>%between%</code>, <code>%inrange%</code>, (multi-)interval comparison, default to include bounds;</li>
+<li><code>%chin%</code>, fast <code>match()</code> of character vectors, alternative to (<code>%in%</code>);</li>
+<li><code>%like%</code>, string pattern matching (i);</li>
+</ul></li>
+<li>Utilities:
+<ul>
+<li><code>copy()</code>, deep copy (the opposite of reference semantics).</li>
+<li><code>tables()</code>, summary of all data.tables in current R session.</li>
+<li><code>options(datatable.optimize)</code>, level of optimization (<Inf>, default, ‘GForce’ optimization; 1L, basic optimization; 0L, no optimization).</li>
+<li><code>options("datatable.print.class" = TRUE)</code>, print column classes;</li>
+</ul></li>
+<li>Syntactic elements: <code>DT[i, j, by]</code>
+<ul>
+<li><code>i</code>: row subsetting (vector scan) with integer index vector or full length logical vector (add auto index, for ‘==’ and ‘%in%’ on one column); if primary or secondary index is set, right outer join (binary search; join order greatly affects performance) with a list/vector of key values or a data.table; if both data.tables have keys, indices are compared in order without name matching; supports anti-join with operator ‘!’.</li>
+<li><code>j</code> returns a vector or (in most cases) a list/data.table of computed result; compound statements (side effects) are also accepted.</li>
+<li><code>keyby</code>, short hand for aggregation and set key (with ordering), faster than <code>by</code>;</li>
+<li><code>by</code>, aggregation preserving the original order of groups (the default third argument; accepts list, character vector and range ‘colA:colB’; if join and aggregation are in the same call of <code>[</code>, <code>by</code> only works properly when set as <code>.EACHI</code>).</li>
+<li>Chaining <code>[</code> is syntactic sugar with no performance advantage, intermediate results are materialized despite name binding, thus subsequent by reference operations will not affect the original data.table; empty <code>[</code> call at the end of query forces printing.</li>
+<li>Names:
+<ul>
+<li><code>.I</code>, index of rows (j);</li>
+<li><code>.N</code>, last row (i) or number of rows (j), (no column materialized; new variable named ‘N’);</li>
+<li><code>.GRP</code>, index of groups; <code>.EACHI</code> (by), group by each row of i, works with <code>on</code> or primary indices; <code>.BY</code>, inherits current group value.</li>
+<li><code>.SD</code>, subset of data by group (a data.table containing all the columns except the grouping columns), only useable in ‘j’; use it with <code>.SDcols</code> if you know which columns to compute on, because otherwise it materializes all columns in the data.table;</li>
+<li>Prefixes <code>x.</code> and <code>y.</code> can explicitly restrict column names in ‘j’, in case of X[Y]; otherwise the returned columns will be (key, j) if ‘j’ is set and is not by reference computation or (key, cols, i.cols) if there is no ‘j’, where ‘key’ is the joined value in Y.</li>
+</ul></li>
+<li>Named arguments:
+<ul>
+<li><code>on</code> specifies join columns and relation, accepts character vector (for equi-join) and list (for non-matching names or non-equi join); automatically creates secondary indices if keys are not available; non-equi joins support all inequality operators (e.g. X[Y, on=.(a, b&gt;b)] looks for X.a == Y.a &amp; X.b &gt; Y.b);</li>
+<li><code>roll</code> (typically on time-series keys) <Inf> or <TRUE> means last observation carried forward (LOCF), &lt;-Inf&gt; means next observation carried backward (NOCB), finite numeric limits how far values are carried forward or backward, ‘nearest’ rolls the nearest value, <FALSE> (default) join on exact match of all keys; <code>rollends</code>, whether the first (smallest) value should row backward and whether the last (largest) value should be rolled forward;</li>
+<li><code>nomatch</code>, handling joins with no match, cannot be used with <code>:=</code>: <NA> (default) for right outer join, 0L for inner join;</li>
+<li><code>mult</code>, handling matched rows of one key value: ‘all’ (default), use ‘first’ or ‘last’ for single row matching;</li>
+<li><code>which</code> for returning row number of matches: <FALSE> (default) returns matched rows, <TRUE> returns the row numbers of matches, <NA> returns the row numbers with no match;</li>
+<li><code>allow.cartesian</code> allows joins that would result in more rows than the sum of the joining tables, defaults to <FALSE>; useful in non-equi join.</li>
+<li><code>with</code>: <FALSE> disables referencing columns as variables (‘j’ only accepts logical/integer/character vector), cannot be used together with by reference operation ‘:=’;</li>
+<li><code>.SDcols</code>, columns in subset of data (SD) (accept names, indices and range);</li>
+</ul></li>
+</ul></li>
+</ul>
+</body>
+</html>
