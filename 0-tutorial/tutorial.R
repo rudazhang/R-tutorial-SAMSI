@@ -33,8 +33,10 @@
 ## Logical connectives
 ## AND
 TRUE & FALSE
+TRUE && FALSE
 ## OR
 TRUE | FALSE
+TRUE || FALSE
 ## NOT
 !TRUE
 
@@ -54,7 +56,7 @@ x
 print(x)
 ## Enclose an expression with parentheses to return visibly.
 (x <- 1)
-print(x <- 1)
+print(x <- 2)
 
 
 ## Function ------------------------------
@@ -66,6 +68,7 @@ help("getwd")
 ?getwd
 ## You may provide an argument to functions.
 exp(1)
+
 ## Or provide a comma-separated list of arguments.
 sum(1, 2)
 ## Some functions have an indefinite number of arguments.
